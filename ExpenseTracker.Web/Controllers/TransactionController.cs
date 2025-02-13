@@ -35,7 +35,8 @@ public class TransactionController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddOrEdit(
-        [Bind("TransactionId,CategoryId,Amount,Note,Date")] Transaction transaction)
+        [Bind("TransactionId,CategoryId,Amount,Note,Date")]
+        Transaction transaction)
     {
         if (ModelState.IsValid)
         {
