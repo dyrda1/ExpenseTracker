@@ -1,0 +1,27 @@
+services:
+  app:
+    image: expense-tracker
+    build: ./ExpenseTracker.Web
+    ports:
+      - "8080:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__Database: "Host=db;Port=5432;Database=expense_tracker;Username=postgres;Password=postgres"
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.10
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: expense_tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
