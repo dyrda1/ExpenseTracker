@@ -82,7 +82,7 @@ jobs:
       - name: 'Docker Stack Deploy'
         uses: cssnr/stack-deploy-action@v1
         with:
-          name: 'expense-tracker'
+          name: expensetracker
           file: 'docker-stack.yaml'
           host: idyrda.site
           user: deploy
