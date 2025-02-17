@@ -65,7 +65,7 @@ jobs:
         with:
           context: ./ExpenseTracker.Web
           push: true
-          tags: ghcr.io/07022004/expense-tracker:${{ needs.commit-hash.outputs.commit_hash }}
+          tags: ghcr.io/dyrda1/expense-tracker:${{ needs.commit-hash.outputs.commit_hash }}
 
   deploy:
     runs-on: ubuntu-latest
