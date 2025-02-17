@@ -35,6 +35,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseHealthChecks("/health");
+
 app.MapControllerRoute(
     "default",
     "{controller=Dashboard}/{action=Index}/{id?}");
