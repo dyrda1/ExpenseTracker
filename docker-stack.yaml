@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/dreamsofcode-io/guestbook:${GIT_COMMIT_HASH}
+    image: ghcr.io/dyrda1/expense-tracker:${GIT_COMMIT_HASH}
     container_name: app
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
