@@ -1,12 +1,10 @@
 services:
   app:
-    image: expense-tracker
-    build: ./ExpenseTracker.Web
+    image: ghcr.io/dreamsofcode-io/guestbook:${GIT_COMMIT_HASH}
     container_name: app
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ConnectionStrings__Database: "Host=db;Port=5432;Database=expense_tracker;Username=postgres;Password=postgres"
-    restart: always
     depends_on:
       - db
 
@@ -19,7 +17,6 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: always
 
   nginx:
     image: nginx:stable-alpine3.20-perl
@@ -34,7 +31,6 @@ services:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
       - ./certbot/etc:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    restart: always
     depends_on:
       - app
     command: /bin/sh -c "envsubst '$$BACKEND_HOST $$BACKEND_PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
@@ -45,7 +41,6 @@ services:
     volumes:
       - ./certbot/etc:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    restart: always
     depends_on:
       - nginx
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'"
