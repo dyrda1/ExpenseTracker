@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/dyrda1/expense-tracker:71b429f8823996aa422a9dbe9edb72c0ac2d046b
+    image: ghcr.io/dyrda1/expense-tracker:${GIT_COMMIT_HASH}
     container_name: app
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
