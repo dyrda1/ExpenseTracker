@@ -83,7 +83,7 @@ jobs:
         uses: cssnr/stack-deploy-action@v1
         with:
           name: expensetracker
-          file: 'docker-stack.yaml'
+          file: 'docker-compose.yaml'
           host: idyrda.site
           user: deploy
           ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}

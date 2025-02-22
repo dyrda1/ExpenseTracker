@@ -1,10 +1,30 @@
 server {
     listen 80;
+    listen [::]:80;
     server_name idyrda.site www.idyrda.site;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443;
+    server_name idyrda.site www.idyrda.site;
+
+    ssl_certificate /etc/letsencrypt/live/idyrda.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/idyrda.site/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/idyrda.site/chain.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
 
     location / {
         proxy_pass http://${BACKEND_HOST}:${BACKEND_PORT};
