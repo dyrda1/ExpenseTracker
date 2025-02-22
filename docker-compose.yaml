@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/dyrda1/expense-tracker:${GIT_COMMIT_HASH}
+    image: ghcr.io/dyrda1/expense-tracker:0afe55a0047046e17cea1342672d1ab34c317e7c
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ConnectionStrings__Database: "Host=db;Port=5432;Database=expense_tracker;Username=postgres;Password=postgres"
@@ -56,7 +56,6 @@ services:
       - certbot-www:/var/www/certbot
     networks:
       - et_network
-      - ingress
     command: >
       /bin/sh -c "
       envsubst '$$BACKEND_HOST $$BACKEND_PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf &&
@@ -105,7 +104,4 @@ volumes:
 
 networks:
   et_network:
-    external: true
-    attachable: true
-  ingress:
     external: true

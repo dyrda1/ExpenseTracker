@@ -1,6 +1,5 @@
 server {
     listen 80;
-    listen [::]:80;
     server_name idyrda.site www.idyrda.site;
 
     location /.well-known/acme-challenge/ {
@@ -14,7 +13,6 @@ server {
 
 server {
     listen 443 ssl;
-    listen [::]:443;
     server_name idyrda.site www.idyrda.site;
 
     ssl_certificate /etc/letsencrypt/live/idyrda.site/fullchain.pem;
