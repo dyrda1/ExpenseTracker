@@ -7,9 +7,12 @@ services:
       - db_conn
     networks:
       - et_network
-    command: >
-      /bin/sh -c "
-      export ConnectionStrings__Database=$$(cat /run/secrets/db_conn)"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        export ConnectionStrings__Database=$$(cat /run/secrets/db_conn) &&
+        dotnet ExpenseTracker.Web.dll
     deploy:
       replicas: 2
       restart_policy:
