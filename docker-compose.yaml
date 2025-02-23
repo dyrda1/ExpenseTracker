@@ -1,8 +1,9 @@
 services:
   app:
-    image: ghcr.io/dyrda1/expense-tracker:0afe55a0047046e17cea1342672d1ab34c317e7c
+    image: ghcr.io/dyrda1/expense-tracker:${GIT_COMMIT_HASH}
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo:4317"
     secrets:
       - db_conn
     networks:
@@ -33,9 +34,6 @@ services:
     networks:
       - et_network
     deploy:
-      placement:
-        constraints:
-          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -62,9 +60,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -84,6 +79,96 @@ services:
       restart_policy:
         condition: on-failure
 
+  prometheus:
+    image: prom/prometheus:v3.2.0
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      - et_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  node-exporter:
+    image: prom/node-exporter:v1.9.0
+    networks:
+      - et_network
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  loki:
+    image: grafana/loki:3.4.2
+    volumes:
+      - loki_data:/loki
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
+    networks:
+      - et_network
+    command: -config.file=/etc/loki/local-config.yaml
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  promtail:
+    image: grafana/promtail:3.4.2
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - et_network
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  tempo:
+    image: grafana/tempo:latest
+    volumes:
+      - tempo_data:/tempo
+    configs:
+      - source: tempo_config
+        target: /etc/tempo/tempo.yaml
+    command: -config.file=/etc/tempo/tempo.yaml
+    networks:
+      - et_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  grafana:
+    image: grafana/grafana:11.5.2-ubuntu
+    ports:
+      - "3000:3000"#TODO
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"#TODO
+      GF_EXPLORE_ENABLED: "true"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - et_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
 secrets:
   db_password:
     external: true
@@ -93,6 +178,14 @@ secrets:
 configs:
   nginx_conf_template:
     external: true
+  prometheus_config:
+    external: true
+  loki_config:
+    external: true
+  promtail_config:
+    external: true
+  tempo_config:
+    external: true
 
 volumes:
   pgdata:
@@ -100,6 +193,14 @@ volumes:
   certbot-etc:
     external: true
   certbot-www:
+    external: true
+  prometheus_data:
+    external: true
+  loki_data:
+    external: true
+  tempo_data:
+    external: true
+  grafana_data:
     external: true
 
 networks:

@@ -1,0 +1,36 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  wal:
+    enabled: false
+  chunk_idle_period: 5m
+  max_transfer_retries: 0
+
+limits_config:
+  ingestion_rate_mb: 4
+  ingestion_burst_size_mb: 8
+  max_line_size: 32000
+
+schema_config:
+  configs:
+    - from: 2023-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+      chunks:
+        prefix: chunk_
+        period: 24h
+
+storage_config:
+  filesystem:
+    directory: /loki
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
