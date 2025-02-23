@@ -3,36 +3,32 @@ services:
     image: ghcr.io/dyrda1/expense-tracker:0afe55a0047046e17cea1342672d1ab34c317e7c
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
-      ConnectionStrings__Database: "Host=db;Port=5432;Database=expense_tracker;Username=postgres;Password=postgres"
+    secrets:
+      - db_conn
     networks:
       - et_network
+    command: >
+      /bin/sh -c "
+      export ConnectionStrings__Database=$$(cat /run/secrets/db_conn)"
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
       update_config:
         order: start-first
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://app:80/health" ]
-      interval: 10s
-      retries: 5
-      start_period: 10s
 
   db:
     image: postgres:15.10
     environment:
       POSTGRES_DB: expense_tracker
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - et_network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      retries: 5
-      start_period: 10s
     deploy:
       placement:
         constraints:
@@ -68,11 +64,6 @@ services:
           - node.role == manager
       restart_policy:
         condition: on-failure
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost" ]
-      interval: 10s
-      retries: 5
-      start_period: 10s
 
   certbot:
     image: certbot/certbot:v3.2.0
@@ -89,6 +80,12 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+
+secrets:
+  db_password:
+    external: true
+  db_conn:
+    external: true
 
 configs:
   nginx_conf_template:

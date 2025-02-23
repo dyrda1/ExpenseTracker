@@ -23,11 +23,11 @@ SyncfusionLicenseProvider.RegisterLicense(
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate(); // Runs migration once at startup
-}
+// using (var scope = app.Services.CreateScope())
+// {
+    // var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // dbContext.Database.Migrate(); // Runs migration once at startup
+// }
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Home/Error");
