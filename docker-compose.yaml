@@ -221,6 +221,8 @@ volumes:
     external: true
   pg_backups:
     external: true
+  certbot-etc:
+    external: true
   certbot-www:
     external: true
   prometheus_data:
