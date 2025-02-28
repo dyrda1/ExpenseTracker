@@ -3,6 +3,7 @@ services:
     image: ghcr.io/dyrda1/expense-tracker:${GIT_COMMIT_HASH}
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:80"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo:4317"
     secrets:
       - db_conn
@@ -45,6 +46,8 @@ services:
     environment:
       BACKEND_HOST: app
       BACKEND_PORT: 80
+    secrets:
+      - nginx_htpasswd
     configs:
       - source: nginx_conf_template
         target: /etc/nginx/nginx.conf.template
@@ -136,9 +139,9 @@ services:
         condition: on-failure
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:r188-7336be4
     volumes:
-      - tempo_data:/tempo
+      - tempo_data:/tmp/tempo
     configs:
       - source: tempo_config
         target: /etc/tempo/tempo.yaml
@@ -153,12 +156,12 @@ services:
 
   grafana:
     image: grafana/grafana:11.5.2-ubuntu
-    ports:
-      - "3000:3000"#TODO
     environment:
-      GF_SECURITY_ADMIN_USER: "admin"
-      GF_SECURITY_ADMIN_PASSWORD: "admin"#TODO
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Editor"
       GF_EXPLORE_ENABLED: "true"
+      GF_SERVER_ROOT_URL: "https://idyrda.site/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
@@ -173,6 +176,8 @@ secrets:
   db_password:
     external: true
   db_conn:
+    external: true
+  nginx_htpasswd:
     external: true
 
 configs:

@@ -70,17 +70,3 @@ app.MapControllerRoute(
     "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.Run();
-
-/*
-builder.Services.AddOpenTelemetry()
-  .WithMetrics(meterProviderBuilder =>
-  {
-    meterProviderBuilder.AddAspNetCoreInstrumentation();
-    meterProviderBuilder.AddPrometheusExporter();
-  });
-app.MapPrometheusScrapingEndpoint();
-8. Recommended Next Steps
-Secure your Prometheus / Grafana / Loki. In production, you’d typically put them behind an auth proxy or use built-in AuthN.
-Alerting: Add Alertmanager so you can define alert rules in Prometheus.
-Expand your .NET instrumentation: capture more application metrics, logs, traces with OpenTelemetry if desired.
-*/
