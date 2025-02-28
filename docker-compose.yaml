@@ -39,6 +39,26 @@ services:
       restart_policy:
         condition: on-failure
 
+  db-backup:
+    image: postgres:15.10
+    depends_on:
+      - db
+    secrets:
+      - db_password
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: expense_tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - pg_backups:/backups
+    networks:
+      - et_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    entrypoint: ["/bin/sh", "-c", "while true; do pg_dump -h db -U postgres expense_tracker > /backups/db_backup_$(date +%Y-%m-%d_%H-%M-%S).sql; sleep 86400; done"]
+
   nginx:
     image: nginx:stable-alpine3.20-perl
     ports:
@@ -196,7 +216,7 @@ configs:
 volumes:
   pgdata:
     external: true
-  certbot-etc:
+  pg_backups:
     external: true
   certbot-www:
     external: true
