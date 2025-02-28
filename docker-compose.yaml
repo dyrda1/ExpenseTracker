@@ -57,7 +57,10 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-    entrypoint: ["/bin/sh", "-c", "while true; do pg_dump -h db -U postgres expense_tracker > /backups/db_backup_$(date +%Y-%m-%d_%H-%M-%S).sql; sleep 86400; done"]
+    entrypoint: >
+      /bin/sh -c "trap exit TERM;
+      while :; do pg_dump -h db -U postgres expense_tracker > /backups/db_backup_$$(date +%Y-%m-%d_%H-%M-%S).sql;
+      sleep 24h & wait $${!}; done"
 
   nginx:
     image: nginx:stable-alpine3.20-perl
